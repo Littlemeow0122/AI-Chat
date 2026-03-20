@@ -1,248 +1,91 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pollinations AI 聊天助手</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #1e293b;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #475569;
-            border-radius: 3px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
-        }
-        
-        .message-bubble {
-            max-width: 85%;
-            word-wrap: break-word;
-        }
-        
-        @media (max-width: 640px) {
-            .message-bubble {
-                max-width: 95%;
-            }
-        }
-        
-        .typing-dot {
-            animation: typing 1.4s infinite ease-in-out both;
-        }
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-        
-        @keyframes typing {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
-        }
-        
-        .file-preview {
-            transition: all 0.2s ease;
-        }
-        .file-preview:hover {
-            transform: translateY(-2px);
-        }
-        
-        pre {
-            position: relative;
-        }
-        .copy-code-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-        pre:hover .copy-code-btn {
-            opacity: 1;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pollinations AI 聊天助手</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 h-screen overflow-hidden">
-    <div class="flex h-full">
-        <!-- Sidebar -->
-        <aside id="sidebar" class="w-80 bg-slate-950 border-r border-slate-800 flex flex-col transition-transform duration-300 transform -translate-x-full md:translate-x-0 absolute md:relative z-20 h-full">
-            <!-- Header -->
-            <div class="p-4 border-b border-slate-800">
-                <div class="flex items-center gap-2 mb-4">
-                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                        <i data-lucide="bot" class="w-5 h-5 text-white"></i>
-                    </div>
-                    <h1 class="font-bold text-lg">AI 聊天助手</h1>
-                </div>
-                
-                <!-- New Chat Button -->
-                <button onclick="chatApp.newChat()" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-2 px-4 flex items-center justify-center gap-2 transition-colors">
-                    <i data-lucide="plus" class="w-4 h-4"></i>
-                    <span>新對話</span>
-                </button>
+<body>
+<div class="flex h-full">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="flex items-center gap-2 mb-4">
+                <div class="logo"><i data-lucide="bot"></i></div>
+                <h1 class="title">AI 聊天助手</h1>
             </div>
-            
-            <!-- Model Selector -->
-            <div class="p-4 border-b border-slate-800">
-                <label class="text-xs text-slate-400 block mb-2">選擇模型</label>
-                <select id="modelSelector" onchange="chatApp.changeModel(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors">
-                    <option value="openai">OpenAI GPT-4o</option>
-                    <option value="mistral">Mistral Large</option>
-                    <option value="llama">Llama 3</option>
-                    <option value="claude">Claude 3</option>
-                    <option value="gemini">Gemini Pro</option>
-                </select>
-            </div>
-            
-            <!-- Chat List -->
-            <div class="flex-1 overflow-y-auto custom-scrollbar p-2" id="chatList">
-                <!-- Chat items will be inserted here -->
-            </div>
-            
-            <!-- Footer Info -->
-            <div class="p-4 border-t border-slate-800 text-xs text-slate-500">
-                <div class="flex items-center gap-2 mb-2">
-                    <i data-lucide="info" class="w-4 h-4"></i>
-                    <span>使用 Pollinations AI API</span>
-                </div>
-                <button onclick="chatApp.clearAllChats()" class="text-red-400 hover:text-red-300 flex items-center gap-1 mt-2">
-                    <i data-lucide="trash-2" class="w-3 h-3"></i>
-                    清除所有對話
-                </button>
-            </div>
-        </aside>
+            <button onclick="chatApp.newChat()" class="btn-new-chat">
+                <i data-lucide="plus"></i> 新對話
+            </button>
+        </div>
 
-        <!-- Main Content -->
-        <main class="flex-1 flex flex-col bg-slate-900 relative">
-            <!-- Mobile Header -->
-            <div class="md:hidden flex items-center justify-between p-4 border-b border-slate-800 bg-slate-950">
-                <button onclick="chatApp.toggleSidebar()" class="p-2 hover:bg-slate-800 rounded-lg">
-                    <i data-lucide="menu" class="w-5 h-5"></i>
-                </button>
-                <span class="font-semibold" id="mobileTitle">新對話</span>
-                <button onclick="chatApp.newChat()" class="p-2 hover:bg-slate-800 rounded-lg">
-                    <i data-lucide="plus" class="w-5 h-5"></i>
-                </button>
+        <div class="sidebar-model">
+            <label>選擇模型</label>
+            <select id="modelSelector" onchange="chatApp.changeModel(this.value)">
+                <option value="openai">OpenAI GPT-4o</option>
+                <option value="mistral">Mistral Large</option>
+                <option value="llama">Llama 3</option>
+                <option value="claude">Claude 3</option>
+                <option value="gemini">Gemini Pro</option>
+            </select>
+        </div>
+
+        <div id="chatList" class="chat-list"></div>
+
+        <div class="sidebar-footer">
+            <div class="info"><i data-lucide="info"></i> 使用 Pollinations AI API</div>
+            <button onclick="chatApp.clearAllChats()" class="btn-clear">清除所有對話</button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="mobile-header">
+            <button onclick="chatApp.toggleSidebar()"><i data-lucide="menu"></i></button>
+            <span id="mobileTitle">新對話</span>
+            <button onclick="chatApp.newChat()"><i data-lucide="plus"></i></button>
+        </div>
+
+        <div class="desktop-header">
+            <h2 id="currentChatTitle">新對話</h2>
+            <span id="currentModelBadge">OpenAI</span>
+            <div class="header-buttons">
+                <button onclick="chatApp.editTitle()"><i data-lucide="edit-2"></i></button>
+                <button onclick="chatApp.deleteCurrentChat()"><i data-lucide="trash-2"></i></button>
             </div>
+        </div>
 
-            <!-- Desktop Header -->
-            <div class="hidden md:flex items-center justify-between p-4 border-b border-slate-800 bg-slate-950/50 backdrop-blur">
-                <div class="flex items-center gap-3">
-                    <h2 id="currentChatTitle" class="font-semibold text-lg">新對話</h2>
-                    <span id="currentModelBadge" class="px-2 py-1 bg-slate-800 text-slate-400 text-xs rounded-full border border-slate-700">OpenAI</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="chatApp.editTitle()" class="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-200" title="重新命名">
-                        <i data-lucide="edit-2" class="w-4 h-4"></i>
-                    </button>
-                    <button onclick="chatApp.deleteCurrentChat()" class="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-red-400" title="刪除對話">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>
-                </div>
+        <div id="messagesContainer" class="messages"></div>
+
+        <div id="typingIndicator" class="typing-indicator hidden">
+            <div class="dots">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
             </div>
+            <span>AI 思考中...</span>
+        </div>
 
-            <!-- Messages Area -->
-            <div id="messagesContainer" class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
-                <!-- Welcome Screen -->
-                <div id="welcomeScreen" class="h-full flex flex-col items-center justify-center text-center p-8">
-                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/20">
-                        <i data-lucide="sparkles" class="w-8 h-8 text-white"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold mb-2">歡迎使用 AI 聊天助手</h2>
-                    <p class="text-slate-400 max-w-md mb-8">
-                        使用 Pollinations AI 強大的模型進行對話。支援多輪對話、檔案上傳、圖片分析等功能。
-                    </p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-lg">
-                        <button onclick="chatApp.setExample('解釋量子計算的基本原理')" class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-left text-sm text-slate-300 transition-colors border border-slate-700">
-                            "解釋量子計算的基本原理"
-                        </button>
-                        <button onclick="chatApp.setExample('幫我寫一個 Python 爬蟲程式')" class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-left text-sm text-slate-300 transition-colors border border-slate-700">
-                            "幫我寫一個 Python 爬蟲程式"
-                        </button>
-                        <button onclick="chatApp.setExample('分析這段程式碼的問題')" class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-left text-sm text-slate-300 transition-colors border border-slate-700">
-                            "分析這段程式碼的問題"
-                        </button>
-                        <button onclick="chatApp.setExample('翻譯這段文字成英文')" class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-left text-sm text-slate-300 transition-colors border border-slate-700">
-                            "翻譯這段文字成英文"
-                        </button>
-                    </div>
-                </div>
+        <div class="input-area">
+            <div id="filePreviewArea" class="file-preview-area hidden"></div>
+            <div class="input-wrapper">
+                <button onclick="document.getElementById('fileInput').click()"><i data-lucide="paperclip"></i></button>
+                <input type="file" id="fileInput" class="hidden" multiple onchange="chatApp.handleFileSelect(event)">
+                <textarea id="messageInput" placeholder="輸入訊息..." onkeydown="chatApp.handleKeyDown(event)" oninput="chatApp.autoResize(this)"></textarea>
+                <button id="sendButton" onclick="chatApp.sendMessage()"><i data-lucide="send"></i></button>
             </div>
+            <div class="disclaimer">AI 可能會產生不準確的資訊，請務必驗證重要資訊。</div>
+        </div>
 
-            <!-- Typing Indicator -->
-            <div id="typingIndicator" class="hidden px-4 py-2">
-                <div class="flex items-center gap-2 text-slate-400 text-sm">
-                    <div class="flex gap-1">
-                        <div class="w-2 h-2 bg-slate-400 rounded-full typing-dot"></div>
-                        <div class="w-2 h-2 bg-slate-400 rounded-full typing-dot"></div>
-                        <div class="w-2 h-2 bg-slate-400 rounded-full typing-dot"></div>
-                    </div>
-                    <span>AI 思考中...</span>
-                </div>
-            </div>
-
-            <!-- Input Area -->
-            <div class="p-4 border-t border-slate-800 bg-slate-950">
-                <!-- File Preview Area -->
-                <div id="filePreviewArea" class="hidden mb-3 flex flex-wrap gap-2">
-                    <!-- File previews will appear here -->
-                </div>
-
-                <div class="flex items-end gap-2 bg-slate-900 rounded-2xl border border-slate-700 p-2 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
-                    <!-- File Upload Button -->
-                    <button onclick="document.getElementById('fileInput').click()" class="p-2 hover:bg-slate-800 rounded-xl text-slate-400 hover:text-blue-400 transition-colors flex-shrink-0" title="上傳檔案或圖片">
-                        <i data-lucide="paperclip" class="w-5 h-5"></i>
-                    </button>
-                    <input type="file" id="fileInput" class="hidden" multiple accept="image/*,.txt,.js,.html,.css,.json,.md,.py,.java,.cpp,.c,.php,.rb,.go,.rs" onchange="chatApp.handleFileSelect(event)">
-                    
-                    <!-- Text Input -->
-                    <textarea 
-                        id="messageInput" 
-                        rows="1" 
-                        placeholder="輸入訊息..." 
-                        class="flex-1 bg-transparent border-none outline-none resize-none py-2 px-1 max-h-32 scrollbar-hide text-slate-200 placeholder-slate-500"
-                        onkeydown="chatApp.handleKeyDown(event)"
-                        oninput="chatApp.autoResize(this)"
-                    ></textarea>
-                    
-                    <!-- Send Button -->
-                    <button onclick="chatApp.sendMessage()" id="sendButton" class="p-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white rounded-xl transition-colors flex-shrink-0">
-                        <i data-lucide="send" class="w-5 h-5"></i>
-                    </button>
-                </div>
-                <div class="text-xs text-slate-500 mt-2 text-center">
-                    AI 可能會產生不準確的資訊，請務必驗證重要資訊。
-                </div>
-            </div>
-
-            <!-- Overlay for mobile sidebar -->
-            <div id="sidebarOverlay" onclick="chatApp.toggleSidebar()" class="fixed inset-0 bg-black/50 z-10 hidden md:hidden backdrop-blur-sm"></div>
-        </main>
-    </div>
-
-    <script src="app.js"></script>
-    <script>
-        lucide.createIcons();
-    </script>
+        <div id="sidebarOverlay" onclick="chatApp.toggleSidebar()" class="sidebar-overlay hidden"></div>
+    </main>
+</div>
+<script src="app.js"></script>
+<script>document.addEventListener('DOMContentLoaded',()=>{lucide.createIcons(); window.chatApp=new ChatApp();});</script>
 </body>
 </html>
