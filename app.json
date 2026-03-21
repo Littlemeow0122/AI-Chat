@@ -1,0 +1,15 @@
+{
+  "name": "Pollinations AI 聊天助手",
+  "url": "https://ai-chat-pollinations.vercel.app",
+  "description": "一個多模型 AI 聊天平台，支援文字對話、檔案上傳與圖片預覽功能，使用 Pollinations AI 提供回覆。",
+  "features": [
+    "多模型選擇：OpenAI GPT-4o、Mistral Large、Llama 3、Claude 3、Gemini Pro",
+    "聊天紀錄管理與多對話支援",
+    "文字輸入與即時訊息生成",
+    "檔案與圖片上傳預覽",
+    "暗色主題 UI 與響應式設計"
+  ],
+  "created_at": "2026-03-21",
+  "author": "Pollinations",
+  "notes": "使用者訊息會發送到 Pollinations AI API 進行回覆生成"
+}
