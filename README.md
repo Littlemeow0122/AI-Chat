@@ -5,8 +5,8 @@ Pollinations AI 聊天助手
 網站連結:  
 **Vercel** : https://ai-chat-pollinations.vercel.app  
 **Google Site** : https://sites.google.com/view/littlemeow0122-github-ai-chat/pollinations-ai-聊天助手  
-**OneCompiler** : https://ai-chat.oneapp.dev
-**Hugging Face** : https://huggingface.co/spaces/meow-mi/Ai-chat
+**OneCompiler** : https://ai-chat.oneapp.dev  
+**Hugging Face** : https://huggingface.co/spaces/meow-mi/Ai-chat  
 
 專案簡介
 --------
