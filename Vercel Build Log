@@ -1,0 +1,12 @@
+09:52:10.939 Running build in Washington, D.C., USA (East) – iad1
+09:52:10.939 Build machine configuration: 2 cores, 8 GB
+09:52:10.949 Cloning github.com/Littlemeow0122/AI-Chat (Branch: main, Commit: b8f5c06)
+09:52:10.950 Skipping build cache, deployment was triggered without cache.
+09:52:11.152 Cloning completed: 203.000ms
+09:52:11.480 Running "vercel build"
+09:52:12.141 Vercel CLI 50.34.2
+09:52:12.254 Build Completed in /vercel/output [16ms]
+09:52:12.583 Deploying outputs...
+09:52:14.253 Deployment completed
+09:52:15.284 Creating build cache...
+09:52:15.308 Skipping cache upload because no files were prepared
